@@ -5,21 +5,21 @@ LIT_VERSION=3.5.4
 LUVIT_TAG=$(shell git describe)
 LUVIT_ARCH=$(shell uname -s)_$(shell uname -m)
 
-PREFIX?=/usr/local
+PREFIX?=.#/usr/local
 PHONY?=test lint size trim lit
 
-test: lit luvit
-	./luvi . -- tests/run.lua
+#test: lit luvit
+#	./luvi . -- tests/run.lua
 
-clean:
-	git clean -dx -f
+#clean:
+#	git clean -dx -f
 
 
-lit:
-	curl -L https://github.com/luvit/lit/raw/$(LIT_VERSION)/get-lit.sh | sh
+#lit:
+#	curl -L https://github.com/luvit/lit/raw/$(LIT_VERSION)/get-lit.sh | sh
 
 luvit: lit $(APP_FILES)
-	./lit make
+	./lit make . luvit luvi
 
 install: luvit lit
 	mkdir -p $(PREFIX)/bin

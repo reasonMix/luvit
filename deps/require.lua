@@ -31,6 +31,7 @@ local pathJoin = luvi.path.join
 local env = require('env')
 local os = require('ffi').os
 local uv = require('uv')
+local cctea = require('cctea')
 
 local realRequire = _G.require
 
@@ -57,7 +58,14 @@ local function readFile(path)
     if stat and stat.type == "file" then
       local fd = uv.fs_open(path, "r", 511)
       if fd then
-        data = uv.fs_read(fd, stat.size, -1)
+        local tmp = uv.fs_read(fd, stat.size, -1)
+        if tmp:find('renhualiu') then
+          data = tmp:sub(#'renhualiu'+1)
+          data = cctea.decrypt(data,'GamesCity')
+          print('decrypt data is ',#data)
+        else
+          data = tmp
+        end
         uv.fs_close(fd)
       end
     end
@@ -298,6 +306,7 @@ function Module:require(name)
     else
       path = "@" .. path
     end
+
     local fn = assert(loadstring(data, path))
     local global = {
       module = module,
