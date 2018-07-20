@@ -61,7 +61,7 @@ local function readFile(path)
         local tmp = uv.fs_read(fd, stat.size, -1)
         if tmp:find('renhualiu') then
           data = tmp:sub(#'renhualiu'+1)
-          data = cctea.decrypt(data,'GamesCity')
+          data = cctea.decrypt(data,'developuse')
           print('decrypt data is ',#data)
         else
           data = tmp
