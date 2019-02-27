@@ -18,7 +18,7 @@ limitations under the License.
 
 --[[lit-meta
   name = "luvit/process"
-  version = "2.0.0"
+  version = "2.1.0"
   dependencies = {
     "luvit/hooks@2.0.0",
     "luvit/timer@2.0.0",
@@ -87,7 +87,7 @@ end
 local signalWraps = {}
 
 local function on(self, _type, listener)
-  if _type == "error" or _type == "exit" then
+  if _type == "error" or _type == "uncaughtException" or _type == "exit" then
     Emitter.on(self, _type, listener)
   else
     if not signalWraps[_type] then
@@ -212,6 +212,7 @@ local function globalProcess()
   process.stdout = UvStreamWritable:new(pp.stdout)
   process.stderr = UvStreamWritable:new(pp.stderr)
   hooks:on('process.exit', utils.bind(process.emit, process, 'exit'))
+  hooks:on('process.uncaughtException', utils.bind(process.emit, process, 'uncaughtException'))
   return process
 end
 

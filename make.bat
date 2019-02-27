@@ -8,11 +8,17 @@ IF NOT EXIST lit.exe CALL make.bat lit
 ECHO "Building luvit"
 lit.exe make
 if %errorlevel% neq 0 goto error
+IF NOT EXIST lit CALL mklink /H lit lit.exe
+if %errorlevel% neq 0 goto error
+IF NOT EXIST luvi CALL mklink /H luvi luvi.exe
+if %errorlevel% neq 0 goto error
+IF NOT EXIST luvit CALL mklink /H luvit luvit.exe
+if %errorlevel% neq 0 goto error
 GOTO :end
 
 :lit
 ECHO "Building lit"
-PowerShell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://github.com/luvit/lit/raw/%LIT_VERSION%/get-lit.ps1'))"
+PowerShell -NoProfile -ExecutionPolicy unrestricted -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iex ((new-object net.webclient).DownloadString('https://github.com/luvit/lit/raw/%LIT_VERSION%/get-lit.ps1'))"
 GOTO :end
 
 :test
