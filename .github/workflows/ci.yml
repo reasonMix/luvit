@@ -1,0 +1,27 @@
+name: CI
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-13, ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: make luvit
+      - name: Test
+        run: make test
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: ./make luvit
+      - name: Test
+        run: ./make test

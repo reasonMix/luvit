@@ -1,25 +1,28 @@
 APP_FILES=$(shell find . -type f -name '*.lua')
 BIN_ROOT=lit/luvi-binaries/$(shell uname -s)_$(shell uname -m)
-LIT_VERSION=3.5.4
+LIT_VERSION=3.8.5
 
 LUVIT_TAG=$(shell git describe)
 LUVIT_ARCH=$(shell uname -s)_$(shell uname -m)
 
-PREFIX?=.#/usr/local
+PREFIX?=/usr/local
 PHONY?=test lint size trim lit
 
-#test: lit luvit
-#	./luvi . -- tests/run.lua
+test: lit luvit
+	./luvi . -- tests/run.lua
 
-#clean:
-#	git clean -dx -f
+cover: lit luvit
+	./luvi . -- -l luacov tests/run.lua
+
+clean:
+	git clean -dx -f
 
 
-#lit:
-#	curl -L https://github.com/luvit/lit/raw/$(LIT_VERSION)/get-lit.sh | sh
+lit:
+	curl -L https://github.com/luvit/lit/raw/$(LIT_VERSION)/get-lit.sh | sh
 
 luvit: lit $(APP_FILES)
-	./lit make . luvit luvi
+	./lit make
 
 install: luvit lit
 	mkdir -p $(PREFIX)/bin
@@ -35,10 +38,10 @@ uninstall:
 tools/certdata.txt:
 	curl https://hg.mozilla.org/mozilla-central/raw-file/tip/security/nss/lib/ckfw/builtins/certdata.txt -o tools/certdata.txt
 
-tools/certs.pem: tools/certdata.txt tools/convert_mozilla_certdata.go
-	cd tools && go run convert_mozilla_certdata.go > certs.pem
+tools/cacert.pem:
+	cd tools && ./update-certs.sh
 
-tools/certs.dat: tools/certs.pem tools/convert.lua
+tools/certs.dat: tools/cacert.pem tools/convert.lua
 	luvit tools/convert
 
 update-certs:	tools/certs.dat

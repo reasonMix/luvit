@@ -18,7 +18,7 @@ limitations under the License.
 
 --[[lit-meta
   name = "luvit/net"
-  version = "2.0.2"
+  version = "2.0.4"
   dependencies = {
     "luvit/timer@2.0.0",
     "luvit/utils@2.0.0",
@@ -135,11 +135,11 @@ function Socket:_read(n)
 end
 
 function Socket:shutdown(callback)
-  if self.destroyed == true then
+  if self.destroyed == true and callback then
     return callback()
   end
 
-  if uv.is_closing(self._handle) then
+  if uv.is_closing(self._handle) and callback then
     return callback()
   end
 
@@ -152,6 +152,24 @@ end
 
 function Socket:keepalive(enable, delay)
   uv.tcp_keepalive(self._handle, enable, delay)
+end
+
+function Socket:getSendBufferSize()
+  return uv.send_buffer_size(self._handle)
+end
+
+function Socket:getRecvBufferSize()
+  return uv.recv_buffer_size(self._handle)
+end
+
+function Socket:setSendBufferSize(size)
+  assert(type(size) == "number" and size > 0, "Size must be a number greater than 0")
+  return uv.send_buffer_size(self._handle, size)
+end
+
+function Socket:setRecvBufferSize(size)
+  assert(type(size) == "number" and size > 0, "Size must be a number greater than 0")
+  return uv.recv_buffer_size(self._handle, size)
 end
 
 function Socket:pause()

@@ -18,12 +18,14 @@ limitations under the License.
 
 --[[lit-meta
   name = "luvit/helpful"
-  version = "2.0.1"
+  version = "2.0.2"
   license = "Apache 2"
   homepage = "https://github.com/luvit/luvit/blob/master/deps/helpful.lua"
   description = "Levenshtein distance for property-not-found hints in modules."
   tags = {"levenshtein", "string"}
 ]]
+
+local unpack = unpack or table.unpack ---@diagnostic disable-line: deprecated
 
 function string.levenshtein(str1, str2)
 
@@ -64,7 +66,7 @@ function string.luvitGlobalExtend()
   getmetatable("").__mod = function(self, values) return self:format(unpack(values)) end
 end
 
-local colorize = require('utils').colorize
+local colorize = require('pretty-print').colorize
 
 return function (prefix, mod)
   mod = mod or require(prefix)
@@ -72,7 +74,7 @@ return function (prefix, mod)
     __index = function (table, wanted)
       if type(wanted) ~= "string" then return end
       local closest = math.huge
-      local name = nil
+      local name
       for key in pairs(table) do
         local distance = string.levenshtein(key, wanted)
         if distance < closest then

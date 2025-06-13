@@ -225,18 +225,12 @@ end
 _meta.__index = ustring
 
 function _meta.__eq(ustr1,ustr2)
-    local len1 = #ustr1
-    local len2 = #ustr2
-    if len1 ~= len2 then return false end
-
-    for i = 1,len1 do
-        if ustr1[i] ~= ustr2[i] then return false end
-    end
-    return true
+    if #ustr1 ~= #ustr2 then return false end
+    return tostring(ustr1) == tostring(ustr2)
 end
 
 function _meta.__tostring(self)
-    return tostring(table.concat(self))
+    return table.concat(self)
 end
 
 function _meta.__concat(ustr1,ustr2)

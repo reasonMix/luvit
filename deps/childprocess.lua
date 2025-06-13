@@ -17,7 +17,7 @@ limitations under the License.
 --]]
 --[[lit-meta
   name = "luvit/childprocess"
-  version = "2.1.1"
+  version = "2.1.3"
   dependencies = {
     "luvit/core@2.0.0",
     "luvit/utils@2.0.0",
@@ -126,6 +126,7 @@ local function spawn(command, args, options)
     em.exitCode = code
     em.signal = signal
     em:emit('exit', code, signal)
+    if stdin then stdin:destroy(maybeClose) end
     maybeClose()
     em:close()
   end
@@ -137,7 +138,8 @@ local function spawn(command, args, options)
     env = envPairs,
     detached = options.detached,
     uid = options.uid,
-    gid = options.gid
+    gid = options.gid,
+    verbatim = options.verbatim,
   }, onExit)
 
   em = Process:new(stdin, stdout, stderr)
@@ -154,11 +156,6 @@ local function spawn(command, args, options)
       if em.stdin then em.stdin:emit('error', Error:new(pid)) end
       if em.stdin then em.stdin:destroy() end
       maybeClose()
-    end)
-  else
-    em:on('exit', function()
-      if em.stdin then em.stdin:destroy() end
-      em:close()
     end)
   end
 
@@ -186,6 +183,8 @@ local function normalizeExecArgs(command, options, callback)
   if isWindows then
     file = 'cmd.exe'
     args = {'/s', '/c', '"'..command..'"'}
+    -- verbatim is necessary to avoid quotation marks getting escaped by Libuv
+    options.verbatim = true
   else
     file = '/bin/sh'
     args = {'-c', command}
@@ -202,9 +201,9 @@ local function _exec(file, args, options, callback)
     maxBuffer = 4 * 1024,
     signal = 'SIGTERM'
   }
-  table.foreach(opts, function(k, v)
+  for k, v in pairs(opts) do
     if not options[k] then options[k] = v end
-  end)
+  end
 
   local child = spawn(file, args, options)
 

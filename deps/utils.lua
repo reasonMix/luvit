@@ -18,7 +18,7 @@ limitations under the License.
 
 --[[lit-meta
   name = "luvit/utils"
-  version = "2.0.0"
+  version = "2.1.0"
   dependencies = {
     "luvit/pretty-print@2.0.0",
   }
@@ -28,11 +28,19 @@ limitations under the License.
   tags = {"luvit", "bind", "adapter"}
 ]]
 
+local unpack = unpack or table.unpack ---@diagnostic disable-line: deprecated
 local Error = require('core').Error
 local utils = {}
 local pp = require('pretty-print')
 for name, value in pairs(pp) do
   utils[name] = value
+end
+
+local function assertResume(thread, ...)
+  local success, err = coroutine.resume(thread, ...)
+  if not success then
+    error(debug.traceback(thread, err), 0)
+  end
 end
 
 local function bind(fn, self, ...)
@@ -82,9 +90,9 @@ local function adapt(c, fn, ...)
   args[nargs + 1] = function (e, ...)
     if waiting then
       if e then
-        assert(coroutine.resume(c, nil, e))
+        assertResume(c, nil, e)
       else
-        assert(coroutine.resume(c, ...))
+        assertResume(c, ...)
       end
     else
       err, data = e and Error:new(e), {...}
@@ -94,7 +102,7 @@ local function adapt(c, fn, ...)
   fn(unpack(args))
   if c then
     waiting = true
-    return coroutine.yield(c)
+    return coroutine.yield()
   elseif err then
     return nil, err
   else
@@ -105,5 +113,6 @@ end
 utils.bind = bind
 utils.noop = noop
 utils.adapt = adapt
+utils.assertResume = assertResume
 
 return utils

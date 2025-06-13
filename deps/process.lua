@@ -18,7 +18,7 @@ limitations under the License.
 
 --[[lit-meta
   name = "luvit/process"
-  version = "2.1.0"
+  version = "2.1.4"
   dependencies = {
     "luvit/hooks@2.0.0",
     "luvit/timer@2.0.0",
@@ -87,6 +87,7 @@ local function kill(pid, signal)
 end
 
 local signalWraps = {}
+local signalListeners = {}
 
 local function on(self, _type, listener)
   if _type == "error" or _type == "uncaughtException" or _type == "exit" then
@@ -98,17 +99,29 @@ local function on(self, _type, listener)
       uv.unref(signal)
       uv.signal_start(signal, _type, function() self:emit(_type) end)
     end
+    signalListeners[_type] = (signalListeners[_type] or 0) + 1
     Emitter.on(self, _type, listener)
   end
 end
 
 local function removeListener(self, _type, listener)
-  local signal = signalWraps[_type]
-  if not signal then return end
-  signal:stop()
-  uv.close(signal)
-  signalWraps[_type] = nil
-  Emitter.removeListener(self, _type, listener)
+  if _type == "error" or _type == "uncaughtException" or _type == "exit" then
+    return Emitter.removeListener(self, _type, listener)
+  else
+    local signal = signalWraps[_type]
+    if not signal then return end
+    local num_removed = Emitter.removeListener(self, _type, listener)
+    if not num_removed then return end
+    signalListeners[_type] = signalListeners[_type] - num_removed
+    -- close the signal if there are no more listeners left
+    if signalListeners[_type] == 0 then
+      signal:stop()
+      uv.close(signal)
+      signalWraps[_type] = nil
+      signalListeners[_type] = nil
+    end
+    return num_removed
+  end
 end
 
 local function exit(self, code)
@@ -204,13 +217,20 @@ local function globalProcess()
   process.env = lenv
   process.cwd = cwd
   process.kill = kill
-  process.pid = uv.getpid()
+  process.pid = uv.os_getpid()
   process.on = on
   process.exit = exit
   process.memoryUsage = memoryUsage
   process.cpuUsage = cpuUsage
   process.removeListener = removeListener
-  process.stdin = UvStreamReadable:new(pp.stdin)
+  if uv.guess_handle(0) ~= "file" then
+    process.stdin = UvStreamReadable:new(pp.stdin)
+  else
+    -- special case for 'file' stdin handle to avoid aborting from
+    -- reading from a pipe to a file descriptor
+    -- see https://github.com/luvit/luvit/issues/1094
+    process.stdin = require('fs').ReadStream:new(nil, {fd=0})
+  end
   process.stdout = UvStreamWritable:new(pp.stdout)
   process.stderr = UvStreamWritable:new(pp.stderr)
   hooks:on('process.exit', utils.bind(process.emit, process, 'exit'))

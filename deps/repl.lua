@@ -84,15 +84,14 @@ return function (stdin, stdout, greeting)
       return '> '
     end
     local chunk  = buffer .. line
-    local f, err = loadstring('return ' .. chunk, 'REPL') -- first we prefix return
+    local f, err = load('return ' .. chunk, 'REPL', nil, global) -- first we prefix return
 
     if not f then
-      f, err = loadstring(chunk, 'REPL') -- try again without return
+      f, err = load(chunk, 'REPL', nil, global) -- try again without return
     end
 
 
     if f then
-      setfenv(f, global)
       buffer = ''
       local success, results = gatherResults(xpcall(f, debug.traceback))
 
@@ -134,9 +133,8 @@ return function (stdin, stdout, greeting)
     if prefix and prefix ~= rest then return end
     local scope
     if base then
-      local f = loadstring("return " .. base)
+      local f = load("return " .. base, nil, nil, global)
       if not f then return {} end
-      setfenv(f, global)
       local ok
       ok, scope = pcall(f)
       if not ok then return {} end
@@ -200,11 +198,11 @@ return function (stdin, stdout, greeting)
     -- Namespace builtin libs to make the repl easier to play with
     -- Requires with filenames with a - in them will be camelcased
     -- e.g. pretty-print -> prettyPrint
-    table.foreach(_builtinLibs, function(_, lib)
+    for _, lib in pairs(_builtinLibs) do
       local requireName = lib:gsub('-.', function (char) return char:sub(2):upper() end)
       local req = string.format('%s = require("%s")', requireName, lib)
       evaluateLine(req)
-    end)
+    end
   end
 
   return {

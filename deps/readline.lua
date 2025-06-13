@@ -40,6 +40,7 @@ local remove = table.remove
 local insert = table.insert
 local concat = table.concat
 local tostring = tostring
+local unpack = unpack or table.unpack ---@diagnostic disable-line: deprecated
 
 local History = {}
 function History:add(line)
@@ -409,7 +410,7 @@ local keyHandlers =
 
 function Editor:onKey(key)
   local char = string.byte(key, 1)
-  local consumedKeys = nil
+  local consumedKeys
 
   for _, keyHandler in ipairs(keyHandlers) do
     local handledKeys = keyHandler[1]
@@ -483,7 +484,9 @@ function Editor:readLine(prompt, callback)
   self.historyIndex = #self.history
 
   self.stdin:set_mode(1)
-  self.stdin:read_start(onKey)
+  self.stdin:read_start(function (...)
+    return coroutine.wrap(onKey)(...)
+  end)
 
 end
 Editor.__index = Editor

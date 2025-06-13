@@ -113,7 +113,7 @@ function len(buf)
   if type(buf) == 'string' then
     return string.len(buf)
   elseif type(buf) == 'table' then
-    return table.getn(buf)
+    return #buf
   else
     return -1
   end
@@ -221,7 +221,7 @@ function roundUpToNextPowerOf2(n)
     n = MAX_HWM
   else
     n = n - 1
-    p = 1
+    local p = 1
     while p < 32 do
       n = bit.bor(n, bit.rshift(n, p))
       p = bit.lshift(p, 1)
@@ -420,7 +420,7 @@ function Readable:read(n)
 end
 
 function chunkInvalid(state, chunk)
-  local er = nil
+  local er
   if type(chunk) ~= 'string' and
     chunk and
     not state.objectMode then

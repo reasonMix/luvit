@@ -1,8 +1,8 @@
 # Luvit 2.0 - Node.JS for the Lua Inventor
 
-[![Linux Build Status](https://travis-ci.org/luvit/luvit.svg?branch=master)](https://travis-ci.org/luvit/luvit)
+[![Linux Build Status](https://github.com/luvit/luvit/actions/workflows/ci.yml/badge.svg)](https://github.com/luvit/luvit/actions/workflows/ci.yml)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/72ccr146fm51k7up/branch/master?svg=true)](https://ci.appveyor.com/project/racker-buildbot/luvit/branch/master)
-[![#luvit on Freenode](https://img.shields.io/Freenode/%23luvit.png)](https://webchat.freenode.net/?channels=luvit)
+[![Coverage Status](https://coveralls.io/repos/github/luvit/luvit/badge.svg?branch=master)](https://coveralls.io/github/luvit/luvit?branch=master)
 
 
 Welcome to the source code for Luvit 2.0.  This repo contains the luvit/luvit metapackage and all luvit/* packages as published to [lit][].
@@ -13,7 +13,7 @@ See the main project webpage for more details. <https://luvit.io/>
 
 ## Need Help?
 
-Ask questions here through issues, on irc [#luvit@freenode](irc://chat.freenode.net/luvit) or the [mailing list](https://groups.google.com/forum/#!forum/luvit).
+Ask questions here through issues, on [Discord](https://discord.gg/luvit) or the [mailing list](https://groups.google.com/forum/#!forum/luvit).
 
 ## Binary Modules
 

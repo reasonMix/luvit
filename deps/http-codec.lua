@@ -18,7 +18,7 @@ limitations under the License.
 
 --[[lit-meta
   name = "luvit/http-codec"
-  version = "2.0.3"
+  version = "2.0.5"
   homepage = "https://github.com/luvit/luvit/blob/master/deps/http-codec.lua"
   description = "A simple pair of functions for converting between hex and raw strings."
   tags = {"codec", "http"}
@@ -111,11 +111,11 @@ local function encoder()
       assert(path and #path > 0, "expected non-empty path")
       head = { item.method .. ' ' .. item.path .. ' HTTP/' .. version .. '\r\n' }
     else
-      local reason = item.reason or STATUS_CODES[item.code]
+      local reason = item.reason or STATUS_CODES[item.code] or "Unknown reason"
       head = { 'HTTP/' .. version .. ' ' .. item.code .. ' ' .. reason .. '\r\n' }
     end
     for i = 1, #item do
-      local key, value = unpack(item[i])
+      local key, value = item[i][1], item[i][2]
       local lowerKey = lower(key)
       if lowerKey == "transfer-encoding" then
         chunkedEncoding = lower(value) == "chunked"

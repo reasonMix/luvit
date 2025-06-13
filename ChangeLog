@@ -1,3 +1,53 @@
+# Changes in 2.18.1
+
+- tls: update certs database [Tim Caswell]
+- luvit: fix main thread tracebacks [@truemedian]
+
+# Changes in 2.18.0
+
+- luvi: bump to v2.12.0 [Tim Caswell]
+- lit: update to 3.8.5 [Tim Caswell]
+- luvit: add the changelog [Tim Caswell]
+- Wrap main in a coroutine [@truemedian]
+
+# Changes in 2.17.1
+
+- http: ignore upgrade header when no upgrade listener is present [Timothy Van Wonterghem]
+- Mitigate bogus errors being returned on stack overflows [Ryan Liptak]
+- Make console/tty write safe [George Zhao]
+- Add Socket:{getSend,getRecv,setSend\,setRecv}BufferSize() [George Zhao]
+- simplify the logic of Emitter:listeners [George Zhao]
+- core: Make Emitter:removeListener return the number of removed handlers [Ryan Liptak]
+- process: Fix signals being closed before all their listeners are removed [Ryan Liptak]
+- Fix luvit argument handling [George Zhao]
+- tls: Fix for OpenSSL 1.1.0 [Ryan Liptak]
+- Add utils.assertResume [SinisterRectus]
+- Localize p in stream_readable.lua [Astie Teddy]
+
+
+# Changes in 2.17.0
+
+- luvi: bump to v2.10.1
+- core: fix Emitter:removeAllListeners (#1088) [Timothy Van Wonterghem]
+- stream: remove extra argument to doWrite call in stream_writable (#1093) [David Newman]
+- fix abort when redirecting stdout/stderr to file (#1095) [Ryan Liptak]
+- process: fix process.stdin abort when stdin is redirected from a file (#1096) [Ryan Liptak]
+- pretty-print: use try_write for tty stderr/stdout (#1097) [George Zhao]
+- lit: bump to v3.8.1
+
+# Changes in 2.16.0
+
+- require: Match only past last . in file extensions (#1047) [Nameless]
+- Add uncaughtException handler (#1048) [Python1320]
+- http-codec: Fix http-codec failing occasionally during chunked decoding [Ryan Liptak]
+- process: update process.env to use portable iterate [George Zhao]
+- tls: Update to work with OpenSSL 1.1.x [George Zhao]
+- net: fix bug in Socket:shutdown [George Zhao]
+- http: only close socket when ServerResponse not need to keepAlive [George Zhao]
+- http: make luvit not collectgarbage manually (#1071) [George Zhao]
+- childprocess: Fix exec on Windows (#1077) [Ryan Liptak]
+- tls: update ssl to support session reuse for TLSV1.3 (#1079) [George Zhao]
+
 # Changes in 2.15.0
 
  - examples: Fix http-download.lua statusCode (#1010) [eZethNesthrown]
